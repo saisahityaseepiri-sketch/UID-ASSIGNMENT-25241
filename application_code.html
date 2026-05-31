@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ride UI</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f5f5f5}
+.navbar{background:black;color:white;display:flex;justify-content:space-between;padding:15px 50px;position:sticky;top:0;z-index:1000}
+.nav-left span,.nav-right span{margin:0 15px;cursor:pointer}
+.signup{background:white;color:black;padding:6px 12px;border-radius:20px}
+.container{display:flex;padding:40px 60px;justify-content:space-between}
+.left{width:50%}
+.left h1{font-size:48px}
+.form-box input{width:80%;padding:12px;margin:10px 0;border-radius:8px;border:none;background:#eaeaea}
+.btn{background:black;color:white;padding:12px 20px;border-radius:8px;cursor:pointer}
+.right img{width:100%;height:420px;border-radius:15px}
+.features{display:flex;justify-content:space-around;background:white;padding:30px}
+.feature{text-align:center;width:200px}
+
+.help-modal,.real-modal{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center
+}
+.help-modal{z-index:3000}
+.real-modal{z-index:2500;background:rgba(0,0,0,.55)}
+.help-box{background:white;padding:20px;width:300px;border-radius:10px}
+.help-box h3,.live-box h3,.option-card h3{margin-top:0}
+.help-box button{
+    width:100%;margin:5px 0;padding:10px;border:none;
+    background:black;color:white;border-radius:5px;cursor:pointer
+}
+.close-btn{float:right;cursor:pointer;font-weight:bold}
+
+.uber-section{padding:55px 60px;background:white}
+.uber-section:nth-of-type(even){background:#f5f5f5}
+.uber-section h2{font-size:34px;margin-bottom:10px}
+.uber-section p{color:#444;line-height:1.6}
+.option-grid{display:flex;gap:20px;margin-top:25px}
+.option-card{
+    background:white;width:33%;padding:25px;border-radius:12px;
+    box-shadow:0 4px 15px rgba(0,0,0,.12);cursor:pointer;transition:.3s
+}
+.option-card:hover{transform:translateY(-6px);box-shadow:0 8px 25px rgba(0,0,0,.18)}
+.service-card{border-left:5px solid black}
+
+.live-box{
+    position:fixed;right:25px;bottom:25px;width:280px;background:white;
+    border-radius:14px;padding:18px;box-shadow:0 5px 25px rgba(0,0,0,.25);
+    display:none;z-index:1500
+}
+.progress-area{background:#e6e6e6;height:8px;border-radius:20px;overflow:hidden;margin:12px 0}
+.progress-fill{height:100%;width:0;background:black;transition:.5s}
+
+.app-screen{background:white;width:380px;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.app-header{background:black;color:white;padding:18px}
+.app-header h3{margin:0}
+.app-body{padding:18px}
+.route-line{border-left:3px solid black;padding-left:15px;margin:15px 0}
+.route-line p{margin:8px 0}
+.visual-car{
+    height:70px;background:#f0f0f0;border-radius:12px;display:flex;
+    align-items:center;justify-content:center;font-size:26px;margin:15px 0;font-weight:bold
+}
+.info-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee}
+.pay-option,.safety-option,.driver-card{
+    background:#f5f5f5;padding:12px;border-radius:10px;margin:10px 0;cursor:pointer
+}
+.pay-option:hover,.safety-option:hover,.driver-card:hover{background:#e8e8e8}
+.confirm-btn{
+    width:100%;background:black;color:white;border:none;padding:13px;
+    border-radius:9px;margin-top:12px;cursor:pointer
+}
+.small-input{width:94%;padding:11px;border:none;background:#eee;border-radius:8px;margin:8px 0}
+.back-top{
+    position:fixed;left:25px;bottom:25px;background:black;color:white;
+    border:none;padding:12px 18px;border-radius:22px;cursor:pointer;
+    display:none;z-index:1500
+}
+.reveal{opacity:0;transform:translateY(35px);transition:.7s}
+.reveal.active{opacity:1;transform:translateY(0)}
+
+@media(max-width:800px){
+    .container{flex-direction:column;padding:30px}
+    .left{width:100%}
+    .right img{height:auto;margin-top:25px}
+    .features,.option-grid{flex-direction:column;align-items:center}
+    .option-card{width:85%}
+    .uber-section{padding:35px 25px}
+    .live-box{width:230px;right:15px}
+    .app-screen{width:90%}
+}
+</style>
+
+<script>
+function openHelp(){document.getElementById("helpModal").style.display="flex"}
+function closeHelp(){document.getElementById("helpModal").style.display="none"}
+function helpOption(text){alert(text)}
+
+function signUp(){
+    let email=prompt("Enter your email:");
+    email&&email.includes("@")?alert("Signup successful!"):alert("Invalid email");
+}
+
+function login(){
+    let email=prompt("Enter your email:");
+    email&&email.includes("@")?alert("Login successful!"):alert("Invalid email");
+}
+
+function showPrices(){
+    let p=document.getElementById("pickup").value;
+    let d=document.getElementById("drop").value;
+    if(p==""||d==""){alert("Enter locations");return}
+    alert("Price: ₹"+(Math.floor(Math.random()*200)+50));
+}
+
+function closeRealModal(){document.getElementById("realModal").style.display="none"}
+
+function openVisualScreen(title,content){
+    document.getElementById("realContent").innerHTML=`
+    <div class="app-screen">
+        <div class="app-header">
+            <span class="close-btn" onclick="closeRealModal()">X</span>
+            <h3>${title}</h3>
+        </div>
+        <div class="app-body">${content}</div>
+    </div>`;
+    document.getElementById("realModal").style.display="flex";
+}
+
+const screens={
+"Verified Drivers":`
+    <div class="driver-card">
+        <h3>Driver: Arjun Kumar</h3><p>Rating: 4.8</p>
+        <p>Vehicle: White Sedan</p><p>Plate: KA 05 AB 1234</p>
+    </div>
+    <div class="driver-card">
+        <h3>Driver: Rahul Sharma</h3><p>Rating: 4.9</p>
+        <p>Vehicle: Black Hatchback</p><p>Plate: TN 10 CD 4567</p>
+    </div>
+    <button class="confirm-btn" onclick="alert('Driver details verified')">Verify Driver</button>`,
+
+"Easy Payments":`
+    <div class="pay-option" onclick="alert('UPI selected')"><b>UPI</b><p>Pay using PhonePe, Google Pay, Paytm</p></div>
+    <div class="pay-option" onclick="alert('Card selected')"><b>Credit / Debit Card</b><p>Pay securely using card</p></div>
+    <div class="pay-option" onclick="alert('Cash selected')"><b>Cash</b><p>Pay directly to driver after ride</p></div>
+    <button class="confirm-btn" onclick="alert('Payment method saved')">Save Payment</button>`,
+
+"Ride Mini":rideScreen("Mini Car","4 min","₹120","Seats","4","Book Ride Mini","Ride Mini booked successfully"),
+"Ride Premium":rideScreen("Premium Car","6 min","₹250","Comfort","High","Book Premium","Ride Premium booked successfully"),
+"Bike Ride":rideScreen("Bike","2 min","₹60","Best for","Traffic","Book Bike","Bike Ride booked successfully"),
+
+"Schedule Ride":`
+    <input class="small-input" type="date">
+    <input class="small-input" type="time">
+    <div class="route-line">
+        <p><b>Pickup:</b> Your saved pickup</p>
+        <p><b>Drop:</b> Your destination</p>
+    </div>
+    <button class="confirm-btn" onclick="alert('Ride scheduled successfully')">Schedule Ride</button>`,
+
+"Safety Support":`
+    <div class="safety-option" onclick="alert('Trip shared with emergency contact')"><b>Share Trip</b><p>Send live ride details to a contact</p></div>
+    <div class="safety-option" onclick="alert('Emergency support contacted')"><b>Emergency Help</b><p>Contact safety support during your ride</p></div>
+    <div class="safety-option" onclick="alert('Driver report submitted')"><b>Report Issue</b><p>Report driver or ride problem</p></div>`,
+
+"Business Travel":`
+    <div class="info-row"><span>Company</span><b>RideApp Business</b></div>
+    <div class="info-row"><span>Monthly rides</span><b>48</b></div>
+    <div class="info-row"><span>Employees</span><b>12</b></div>
+    <div class="info-row"><span>Billing</span><b>Company account</b></div>
+    <button class="confirm-btn" onclick="alert('Business ride requested')">Request Business Ride</button>`
+};
+
+function rideScreen(car,eta,fare,label,value,btn,msg){
+    return `
+    <div class="visual-car">${car}</div>
+    <div class="route-line">
+        <p><b>Pickup:</b> Current location</p>
+        <p><b>Drop:</b> Selected destination</p>
+    </div>
+    <div class="info-row"><span>ETA</span><b>${eta}</b></div>
+    <div class="info-row"><span>Fare</span><b>${fare}</b></div>
+    <div class="info-row"><span>${label}</span><b>${value}</b></div>
+    <button class="confirm-btn" onclick="alert('${msg}')">${btn}</button>`;
+}
+
+function chooseOption(option){
+    option==="Live Tracking"?startLiveTracking():openVisualScreen(option,screens[option]);
+}
+
+let trackValue=0,trackingTimer;
+
+function startLiveTracking(){
+    document.getElementById("liveBox").style.display="block";
+    document.getElementById("trackingText").innerText="Driver is on the way...";
+    trackValue=0;
+    document.getElementById("progressFill").style.width="0%";
+    clearInterval(trackingTimer);
+
+    trackingTimer=setInterval(function(){
+        trackValue+=20;
+        document.getElementById("progressFill").style.width=trackValue+"%";
+        if(trackValue===40)document.getElementById("trackingText").innerText="Driver is near your pickup location";
+        if(trackValue===80)document.getElementById("trackingText").innerText="Ride is in progress";
+        if(trackValue>=100){
+            document.getElementById("trackingText").innerText="Ride completed successfully";
+            clearInterval(trackingTimer);
+        }
+    },1000);
+}
+
+function closeLiveBox(){
+    document.getElementById("liveBox").style.display="none";
+    clearInterval(trackingTimer);
+}
+
+window.addEventListener("scroll",function(){
+    document.querySelectorAll(".reveal").forEach(function(item){
+        if(item.getBoundingClientRect().top<window.innerHeight-100)item.classList.add("active");
+    });
+    document.getElementById("backTop").style.display=window.scrollY>300?"block":"none";
+});
+
+function backToTop(){window.scrollTo({top:0,behavior:"smooth"})}
+</script>
+</head>
+
+<body>
+<div class="navbar">
+    <div class="nav-left">
+        <b>RideApp</b>
+        <span>Ride</span><span>Drive</span><span>Business</span>
+    </div>
+    <div class="nav-right">
+        <span onclick="openHelp()">Help</span>
+        <span onclick="login()">Login</span>
+        <span class="signup" onclick="signUp()">Sign up</span>
+    </div>
+</div>
+
+<div class="container">
+    <div class="left">
+        <h1>Go anywhere with ease</h1>
+        <div class="form-box">
+            <input id="pickup" placeholder="Enter pickup"><br>
+            <input id="drop" placeholder="Enter drop"><br>
+            <div class="btn" onclick="showPrices()">See Prices</div>
+        </div>
+    </div>
+    <div class="right">
+        <img src="https://cdn.motor1.com/images/mgl/yMVyG/s1/ubermoto.jpg">
+    </div>
+</div>
+
+<div class="features">
+    <div class="feature"><h3>Daily rides</h3></div>
+    <div class="feature"><h3>On-time</h3></div>
+    <div class="feature"><h3>Safe</h3></div>
+    <div class="feature"><h3>24/7</h3></div>
+</div>
+
+<div class="uber-section reveal">
+    <h2>Why ride with us?</h2>
+    <p>Choose smart travel options with tracking, verified drivers, and easy payments.</p>
+    <div class="option-grid">
+        <div class="option-card" onclick="chooseOption('Live Tracking')"><h3>Live Tracking</h3><p>Track your ride status from pickup to drop.</p></div>
+        <div class="option-card" onclick="chooseOption('Verified Drivers')"><h3>Verified Drivers</h3><p>Ride with trained and verified drivers.</p></div>
+        <div class="option-card" onclick="chooseOption('Easy Payments')"><h3>Easy Payments</h3><p>Pay easily using cash, card, UPI, or wallet.</p></div>
+    </div>
+</div>
+
+<div class="uber-section reveal">
+    <h2>Popular Services</h2>
+    <p>Select the type of ride that matches your travel need.</p>
+    <div class="option-grid">
+        <div class="option-card service-card" onclick="chooseOption('Ride Mini')"><h3>Ride Mini</h3><p>Affordable rides for daily travel.</p></div>
+        <div class="option-card service-card" onclick="chooseOption('Ride Premium')"><h3>Ride Premium</h3><p>Comfort rides for business and special trips.</p></div>
+        <div class="option-card service-card" onclick="chooseOption('Bike Ride')"><h3>Bike Ride</h3><p>Fast travel through city traffic.</p></div>
+    </div>
+</div>
+
+<div class="uber-section reveal">
+    <h2>More Options</h2>
+    <p>Use extra ride features for planned travel, safety, and company rides.</p>
+    <div class="option-grid">
+        <div class="option-card" onclick="chooseOption('Schedule Ride')"><h3>Schedule Ride</h3><p>Book a ride in advance.</p></div>
+        <div class="option-card" onclick="chooseOption('Safety Support')"><h3>Safety Support</h3><p>Get support during your trip.</p></div>
+        <div class="option-card" onclick="chooseOption('Business Travel')"><h3>Business Travel</h3><p>Manage work rides easily.</p></div>
+    </div>
+</div>
+
+<div class="live-box" id="liveBox">
+    <h3>Live Tracking</h3>
+    <p id="trackingText">Driver is on the way...</p>
+    <div class="progress-area"><div class="progress-fill" id="progressFill"></div></div>
+    <button class="btn" onclick="closeLiveBox()">Close</button>
+</div>
+
+<div class="real-modal" id="realModal"><div id="realContent"></div></div>
+<button class="back-top" id="backTop" onclick="backToTop()">Top</button>
+
+<div class="help-modal" id="helpModal">
+    <div class="help-box">
+        <span class="close-btn" onclick="closeHelp()">✖</span>
+        <h3>Help Center</h3>
+        <button onclick="helpOption('Enter locations and click See Prices')">Booking Ride</button>
+        <button onclick="helpOption('Check payment method or retry')">Payment Issue</button>
+        <button onclick="helpOption('Cancel from your ride section')">Cancel Ride</button>
+        <button onclick="helpOption('Email: support@rideapp.com')">Contact Support</button>
+    </div>
+</div>
+</body>
+</html>
